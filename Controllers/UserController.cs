@@ -26,7 +26,6 @@ namespace BankingApp.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/User/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(long id)
         {
@@ -40,30 +39,42 @@ namespace BankingApp.Controllers
             return user;
         }
 
-        // PUT: api/User/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpGet("/login")]
+        public async Task<ActionResult<IEnumerable<UserDto>>> LoginUser([FromQuery]User userLogin)
+        {   
+            var user = await _context.Users.SingleOrDefaultAsync(user => user.Username == userLogin.Username);
+            Console.WriteLine(user.Password);
+            if (user == null) {
+                Console.WriteLine("null user");
+                return NotFound();
+            }
+
+            bool validPasword = BCrypt.Net.BCrypt.EnhancedVerify(userLogin.Password, user.Password);
+            // Console.WriteLine(BCrypt.Net.BCrypt.EnhancedHashPassword(userLogin.Password, user.Password));
+            if (validPasword) {
+                UserDto userDto = new(user.Id, user.Username);
+                
+                return Ok(userDto);
+            } else {
+                return NotFound();
+            }            
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(long id, User user)
         {
-            if (id != user.Id)
-            {
+            if (id != user.Id) {
                 return BadRequest();
             }
 
             _context.Entry(user).State = EntityState.Modified;
 
-            try
-            {
+            try{
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
+            } catch (DbUpdateConcurrencyException){
+                if (!UserExists(id)){
                     return NotFound();
-                }
-                else
-                {
+                } else {
                     throw;
                 }
             }
@@ -71,18 +82,18 @@ namespace BankingApp.Controllers
             return NoContent();
         }
 
-        // POST: api/User
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            
+            string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(user.Password, 10);
+            user.Password = passwordHash;
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
-        // DELETE: api/User/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(long id)
         {
