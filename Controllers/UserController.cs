@@ -39,18 +39,18 @@ namespace BankingApp.Controllers
             return user;
         }
 
-        [HttpGet("/login")]
+        [HttpGet("login")]
         public async Task<ActionResult<IEnumerable<UserDto>>> LoginUser([FromQuery]User userLogin)
         {   
             var user = await _context.Users.SingleOrDefaultAsync(user => user.Username == userLogin.Username);
-            Console.WriteLine(user.Password);
+
             if (user == null) {
                 Console.WriteLine("null user");
                 return NotFound();
             }
 
             bool validPasword = BCrypt.Net.BCrypt.EnhancedVerify(userLogin.Password, user.Password);
-            // Console.WriteLine(BCrypt.Net.BCrypt.EnhancedHashPassword(userLogin.Password, user.Password));
+           
             if (validPasword) {
                 UserDto userDto = new(user.Id, user.Username);
                 
@@ -98,8 +98,7 @@ namespace BankingApp.Controllers
         public async Task<IActionResult> DeleteUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
+            if (user == null){
                 return NotFound();
             }
 
@@ -109,8 +108,7 @@ namespace BankingApp.Controllers
             return NoContent();
         }
 
-        private bool UserExists(long id)
-        {
+        private bool UserExists(long id){
             return _context.Users.Any(e => e.Id == id);
         }
     }
