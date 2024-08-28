@@ -8,4 +8,5 @@ public class UserContext : DbContext {
     }
 
     public DbSet<User> Users { get; set;} = null!;
+    public DbSet<Account> Accounts { get; set;} = null!;
 }

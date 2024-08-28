@@ -9,20 +9,17 @@ using BankingApp.Models;
 
 namespace BankingApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
-    public class UserController : ControllerBase
-    {
+    public class UserController : ControllerBase{
         private readonly UserContext _context;
 
-        public UserController(UserContext context)
-        {
+        public UserController(UserContext context) {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers() {
             return await _context.Users.ToListAsync();
         }
 
@@ -61,8 +58,7 @@ namespace BankingApp.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(long id, User user)
-        {
+        public async Task<IActionResult> PutUser(long id, User user) {
             if (id != user.Id) {
                 return BadRequest();
             }
@@ -83,9 +79,7 @@ namespace BankingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            
+        public async Task<ActionResult<User>> PostUser(User user) {
             string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(user.Password, 10);
             user.Password = passwordHash;
             _context.Users.Add(user);
@@ -95,10 +89,9 @@ namespace BankingApp.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(long id)
-        {
+        public async Task<IActionResult> DeleteUser(long id) {
             var user = await _context.Users.FindAsync(id);
-            if (user == null){
+            if (user == null) {
                 return NotFound();
             }
 
