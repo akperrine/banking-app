@@ -11,4 +11,11 @@ public class Account {
     [System.ComponentModel.DataAnnotations.Schema.ForeignKey("User")]
     public long UserId {get; set;}
 
+    Account() {
+
+    }
+
+    Account(long userId) {
+        this.UserId = userId;
+    }
 }

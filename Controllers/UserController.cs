@@ -87,8 +87,10 @@ namespace BankingApp.Controllers
             user.Password = passwordHash;
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            Console.WriteLine(user.Id);
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            CreatedAtActionResult result = CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            return result;
         }
 
         [HttpDelete("{id}")]
