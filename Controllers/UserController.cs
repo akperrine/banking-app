@@ -26,13 +26,16 @@ namespace BankingApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(long id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Include(user => user.CheckingAccount)
+                .Include(user => user.SavingsAccount)
+                .FirstOrDefaultAsync(user => user.Id == id);
 
             if (user == null)
             {
                 return NotFound();
             }
-
+            Console.WriteLine("user is found: " + user.Username);
             return user;
         }
 
