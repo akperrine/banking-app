@@ -12,9 +12,9 @@ namespace BankingApp.Controllers
     [Route("api/")]
     [ApiController]
     public class UserController : ControllerBase{
-        private readonly UserContext _context;
+        private readonly BankingAppContext _context;
 
-        public UserController(UserContext context) {
+        public UserController(BankingAppContext context) {
             _context = context;
         }
 
@@ -104,7 +104,7 @@ namespace BankingApp.Controllers
             User user = new User();
             user.Username = registerCredentials.Username;
             user.Password = registerCredentials.Password;
-            
+
             string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(user.Password, 10);
             user.Password = passwordHash;
             Account checkingAccount = new(user.Id, true);
