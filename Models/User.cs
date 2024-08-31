@@ -5,12 +5,10 @@ public class User
     public long Id {get; set;}
     public string Username {get; set;}
     public string Password {get; set;}
-    public Account SavingsAccount {get; set;}
-    public Account CheckingAccount {get; set;}
-
+    public List<Account> Accounts {get; set;}
 
     public User() {
-        
+        Accounts = new List<Account>();
     }
 
      public User(string username, string password) {

@@ -27,8 +27,6 @@ namespace BankingApp.Controllers
         public async Task<ActionResult<User>> GetUser(long id)
         {
             var user = await _context.Users
-                .Include(user => user.CheckingAccount)
-                .Include(user => user.SavingsAccount)
                 .FirstOrDefaultAsync(user => user.Id == id);
 
             if (user == null)
@@ -81,10 +79,39 @@ namespace BankingApp.Controllers
             return NoContent();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> PutFunds(PaymentDto paymentInfo) {
+            if (!UserExists(paymentInfo.UserId)) {
+                return BadRequest();
+            }
+
+
+
+            try {
+                await _context.SaveChangesAsync();
+            } catch (DbUpdateException) {
+                 if (!UserExists(paymentInfo.UserId)){
+                    return NotFound();
+                } else {
+                    throw;
+                }
+            }
+            return NoContent();
+        }
+
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user) {
+        public async Task<ActionResult<User>> PostUser(LoginDto registerCredentials) {
+            User user = new User();
+            user.Username = registerCredentials.Username;
+            user.Password = registerCredentials.Password;
+            
             string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(user.Password, 10);
             user.Password = passwordHash;
+            Account checkingAccount = new(user.Id, true);
+            Account savingsAccount = new(user.Id, false);
+            user.Accounts.Add(checkingAccount);
+            user.Accounts.Add(savingsAccount);
+            
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             Console.WriteLine(user.Id);
