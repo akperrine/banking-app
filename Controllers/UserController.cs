@@ -33,6 +33,12 @@ namespace BankingApp.Controllers
             {
                 return NotFound();
             }
+
+            var accounts = await _context.Accounts
+                .Where(account => account.UserId == id)
+                .ToListAsync();
+            Console.WriteLine("accounts " + accounts.Count());
+
             Console.WriteLine("user is found: " + user.Username);
             return user;
         }
@@ -85,7 +91,33 @@ namespace BankingApp.Controllers
                 return BadRequest();
             }
 
+           
+            var user = await _context.Users
+                .FirstOrDefaultAsync(user => user.Id == paymentInfo.UserId);
 
+                
+            var accounts = await _context.Accounts
+                .Where(account => account.UserId == paymentInfo.AddFundAccountId)
+                .ToListAsync();
+            Account toAccount = null, fromAccount = null;
+            foreach (Account account in accounts) {
+                if (paymentInfo.AddFundAccountId == account.Id) {
+                    toAccount = account;
+                    continue;
+                }
+                if (paymentInfo.RemoveFundAccountId == account.Id) {
+                    fromAccount = account;
+                }
+            }
+            if (toAccount == null || fromAccount == null) {
+                Console.WriteLine("not set");
+                return BadRequest();
+            }
+
+            toAccount.Balance += paymentInfo.Amount;
+            fromAccount.Balance -= paymentInfo.Amount;
+
+            
 
             try {
                 await _context.SaveChangesAsync();
